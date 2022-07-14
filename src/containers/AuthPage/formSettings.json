@@ -75,31 +75,23 @@
   },
   "data": {
     "login": {
-      "value": {
-        "identifier": "",
-        "password": "",
-        "rememberMe": false
-      }
+      "identifier": "",
+      "password": "",
+      "rememberMe": false
     },
     "forgot-password": {
-      "value": {
-        "email": ""
-      }
+      "email": ""
     },
     "register": {
-      "value": {
-        "username": "",
-        "password": "",
-        "confirmPassword": "",
-        "email": ""
-      }
+      "username": "",
+      "password": "",
+      "confirmPassword": "",
+      "email": ""
     },
     "reset-password": {
-      "value": {
-        "password": "",
-        "passwordConfirmation": "",
-        "code": ""
-      }
+      "password": "",
+      "passwordConfirmation": "",
+      "code": ""
     }
   }
 }
