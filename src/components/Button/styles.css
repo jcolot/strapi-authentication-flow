@@ -1,0 +1,15 @@
+.shadow {
+  box-shadow: 0 3px 6px rgba(0,0,0,.15)!important;
+}
+
+.btn {
+  background: #fff;
+  color: #000;
+  position: relative;
+}
+
+.btn svg {
+  position: absolute;
+  left: 40px;
+  top: 10px;
+}
