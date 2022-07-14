@@ -3,11 +3,11 @@ import { includes, mapKeys, reject } from 'lodash';
 /**
  * [validateInput description]
  * @param  {String || Number} value  Input's value
- * @param  {Object} inputValidations
+ * @param  {Object} inputValidation
  * @param  {String} [type='text']    Optionnal: the input's type only for email
  * @return {Array}                  Array of errors to be displayed
  */
-const validateInput = (value, inputValidations = {}, type = 'text') => {
+const validateInput = (value, inputValidation = {}, type = 'text') => {
   let errors = [];
 
   const emailRegex = new RegExp(
@@ -16,7 +16,7 @@ const validateInput = (value, inputValidations = {}, type = 'text') => {
   // handle i18n
   const requiredError = { id: 'components.Input.error.validation.required' };
 
-  mapKeys(inputValidations, (validationValue, validationKey) => {
+  mapKeys(inputValidation, (validationValue, validationKey) => {
     switch (validationKey) {
       case 'max':
         if (parseInt(value, 10) > validationValue) {

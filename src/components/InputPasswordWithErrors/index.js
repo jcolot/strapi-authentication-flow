@@ -17,7 +17,7 @@ import InputErrors from '../../components/InputErrors';
 import InputPassword from '../../components/InputPassword';
 
 // Utils
-import validateInput from '../../utils/inputsValidations';
+import validateInput from '../../utils/inputValidation';
 
 import './styles.css';
 

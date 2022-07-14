@@ -14,6 +14,8 @@ import EditPage from '../../containers/EditPage';
 import HomePage from '../../containers/HomePage';
 import NotFoundPage from '../../containers/NotFoundPage';
 import ProductPage from '../../containers/ProductPage';
+import { ToastContainer } from 'react-toastify';
+
 
 // This component ios HoC that prevents the user from accessing a route if he's not logged in
 import PrivateRoute from '../../containers/PrivateRoute';
@@ -25,24 +27,25 @@ const App = () => {
   return (
     <Router>
       <div className="App">
+        <ToastContainer />
         <Routes>
           {/* A user can't go to the HomePage if is not authenticated */}
-          <Route path="/auth/:authType" element={<AuthPage/>} />
-          <Route path="/auth/:authType/:id" element={<AuthPage/>} />
-          <Route exact path='/' element={<PrivateRoute/>}>
-            <Route exact path='/' element={<HomePage/>}/>
+          <Route path="/auth/:authType" element={<AuthPage />} />
+          <Route path="/auth/:authType/:id" element={<AuthPage />} />
+          <Route exact path='/' element={<PrivateRoute />}>
+            <Route exact path='/' element={<HomePage />} />
           </Route>
 
-          <Route exact path="/product" element={<PrivateRoute/>}>
-            <Route exact path="/product" element={<ProductPage/>}/>
+          <Route exact path="/product" element={<PrivateRoute />}>
+            <Route exact path="/product" element={<ProductPage />} />
           </Route>
 
-          <Route exact path="/:contentType/:id" element={<PrivateRoute/>}>
-            <Route exact path="/:contentType/:id" element={<EditPage/>}/>
-          </Route>          
-          
-          <Route exact path="/connect/:provider" element={<ConnectPage/>} />
-          <Route path="" element={<NotFoundPage/>} />
+          <Route exact path="/:contentType/:id" element={<PrivateRoute />}>
+            <Route exact path="/:contentType/:id" element={<EditPage />} />
+          </Route>
+
+          <Route exact path="/connect/:provider" element={<ConnectPage />} />
+          <Route path="" element={<NotFoundPage />} />
         </Routes>
       </div>
     </Router>

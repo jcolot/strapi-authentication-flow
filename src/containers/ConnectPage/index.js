@@ -5,48 +5,47 @@
  */
 
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from "react";
+import { useLocation, useNavigate, useMatch } from 'react-router-dom';
 
 
 // Utils
 import auth from '../../utils/auth';
 import request from '../../utils/request';
 
-class ConnectPage extends React.Component {
+const ConnectPage = () => {
   // We only use this lifecycle because it's only mounted once and the saga already handle
   // the redirections depending on the API response
 
   // NOTE: YOU can delete this container and do the logic in the HomePage formContainer
-  // This implementation was just made for the sake of the example and to silmplify the logic
-  componentDidMount() {
-    const { provider } = useParams();
-    const requestURL = `http://localhost:1337/auth/${provider}`;
-    console.log('here');
+  // This implementation was just made for the sake of the example and to simplify the logic
+
+  const match = useMatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    const requestURL = `http://localhost:1337/auth/${match.provider}/callback${location.search}`;
 
     request(requestURL, { method: 'GET' })
       .then(response => {
         auth.setToken(response.jwt, true);
         auth.setUserInfo(response.user, true);
-        this.redirectUser('/');
+        navigate('/');
       })
       .catch(err => {
         console.log(err.response.payload);
-        this.redirectUser('/auth/login');
-      });
-  }
+        navigate('/auth/login');
+      })
+  });
 
-  redirectUser = path => {
-    const navigate = useNavigate();
-    navigate(path);
-  };
 
-  render() {
-    return (
-      <div>
-        <h1>Retrieving your token and checking its validity</h1>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h1>Retrieving your token and checking its validity</h1>
+    </div>
+  );
 }
 
 export default ConnectPage;

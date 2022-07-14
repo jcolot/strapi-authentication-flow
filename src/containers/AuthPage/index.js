@@ -7,7 +7,9 @@
 import React from 'react';
 import { useState } from "react";
 import { findIndex, get, map, replace, set } from 'lodash';
-import {  Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 import Button from '../../components/Button';
 import FormDivider from '../../components/FormDivider';
@@ -21,6 +23,7 @@ import request from '../../utils/request';
 
 import formSettings from './formSettings.json';
 import './styles.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthPage = () => {
 
@@ -29,8 +32,9 @@ const AuthPage = () => {
   const navigate = useNavigate();
 
 
-  const [ errors, setErrors ] = useState([]);
-  const [ didCheckErrors, setDidCheckErrors ] = useState(false );
+
+  const [errors, setErrors] = useState([]);
+  const [didCheckErrors, setDidCheckErrors] = useState(false);
 
   const getInitialFormValues = () => {
 
@@ -51,7 +55,7 @@ const AuthPage = () => {
     const initialFormValues = getInitialFormValues();
     return initialFormValues;
   });
-  
+
   const divStyle =
     params.authType === 'register'
       ? { marginTop: '3.2rem' }
@@ -82,7 +86,7 @@ const AuthPage = () => {
   };
 
   const handleChange = ({ target }) =>
-    setFormValues({ ...formValues, [target.name]: target.value});
+    setFormValues({ ...formValues, [target.name]: target.value });
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -104,9 +108,22 @@ const AuthPage = () => {
       .catch(err => {
         // TODO handle errors for other views
         // This is just an example
-        setErrors([
-          { name: 'identifier', errors: [err.response.payload.error.message] },
-        ]);
+
+        toast.error(`Error! ${err}`, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        if (! typeof err === 'undefined') {
+          setErrors([
+            { name: 'identifier', errors: [err.response.payload.error.message] },
+          ]);
+        }
         setDidCheckErrors(!didCheckErrors);
       });
   };
@@ -202,7 +219,6 @@ const AuthPage = () => {
       </div>
     </div>
   );
-  
 }
 
 AuthPage.defaultProps = {};
