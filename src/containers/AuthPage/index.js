@@ -68,16 +68,16 @@ const AuthPage = () => {
 
     switch (params.authType) {
       case 'login':
-        requestURL = 'http://localhost:1337/api/auth/local';
+        requestURL = `${process.env.REACT_APP_STRAPI_HOST}/api/auth/local`;
         break;
       case 'register':
-        requestURL = 'http://localhost:1337/api/auth/local/register';
+        requestURL = `${process.env.REACT_APP_STRAPI_HOST}/api/auth/local/register`;
         break;
       case 'reset-password':
-        requestURL = 'http://localhost:1337/api/auth/reset-password';
+        requestURL = `${process.env.REACT_APP_STRAPI_HOST}/api/auth/reset-password`;
         break;
       case 'forgot-password':
-        requestURL = 'http://localhost:1337/api/auth/forgot-password';
+        requestURL = `${process.env.REACT_APP_STRAPI_HOST}/api/auth/forgot-password`;
         break;
       default:
     }
@@ -96,7 +96,7 @@ const AuthPage = () => {
 
     // This line is required for the callback url to redirect your user to app
     if (params.authType === 'forgot-password') {
-      set(body, 'url', 'http://localhost:3000/api/auth/reset-password');
+      set(body, 'url', `${process.env.REACT_APP_HOST}/api/auth/reset-password`);
     }
 
     request(requestURL, { method: 'POST', body: body })
@@ -106,24 +106,33 @@ const AuthPage = () => {
         navigate('/');
       })
       .catch(err => {
-        // TODO handle errors for other views
-        // This is just an example
-
-        toast.error(`Error! ${err}`, {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-
-        if (! typeof err === 'undefined') {
+        if (! 'response' in err) {
+          toast.error(`Error! ${err}`, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
           setErrors([
             { name: 'identifier', errors: [err.response.payload.error.message] },
           ]);
+
+          toast.error(`Error! ${err.response.payload.error.message}`, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+
         }
+
         setDidCheckErrors(!didCheckErrors);
       });
   };

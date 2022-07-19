@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 import { differenceBy, isEmpty } from 'lodash';
@@ -16,80 +16,66 @@ import InputFile from '../InputFile';
 
 import './styles.scss';
 
-class InputFileWithErrors extends React.Component {
-  state = { label: false, hasValue: false };
+const InputFileWithErrors = (props) => {
 
-  componentDidMount() {
-    if (this.props.multiple && !isEmpty(this.props.value)) {
-      this.setState({ label: 1, hasValue: true });
+  const [label, setLabel] = useState(false);
+  const [hasValue, setHasValue] = useState(false);
+
+  useEffect(() => {
+    if (props.multiple && !isEmpty(props.value)) {
+      setLabel(1);
+      setHasValue(true);
     }
-  }
+  }, []);
 
-  componentDidUpdate(nextProps) {
-    if (!this.state.hasValue && !isEmpty(nextProps.value) && nextProps.multiple && differenceBy(nextProps.value, this.props.value, 'name').length > 0) {
-      this.setState({ label: 1, hasValue: true });
+
+  const previousValue = useRef(props.value); 
+
+  useEffect(() => {
+    if (!hasValue && !isEmpty(props.value) && props.multiple && differenceBy(props.value, previousValue.current, 'name').length > 0) {
+      setLabel(1);
+      setHasValue(true);
+      previousValue.current = props.value;
     }
-  }
+  });
 
-  setLabel = (label) => {
-    this.setState({ label });
-  }
-  // TODO handle errors lifecycle
-  render() {
-    const {
-      className,
-      customBootstrapClass,
-      inputDescription,
-      inputDescriptionClassName,
-      inputDescriptionStyle,
-      label,
-      labelClassName,
-      labelStyle,
-      multiple,
-      name,
-      onChange,
-      style,
-      value,
-    } = this.props;
+  const labelClass = props.labelClassName === '' ? 'labelFile' : props.labelClassName;
 
-    const labelClass = labelClassName === '' ? 'labelFile' : labelClassName;
-  
-    return (
-      <div
-        className={cn(
-          'inputFileWithErrorsContainer',
-          customBootstrapClass,
-          className !== '' && className,
+  return (
+    <div
+      className={cn(
+        'inputFileWithErrorsContainer',
+        props.customBootstrapClass,
+        props.className !== '' && props.className,
+      )}
+      style={props.style}
+    >
+      <div className="labelContainer">
+
+        <Label
+          className={labelClass}
+          htmlFor={`${props.name}NotNeeded`}
+          message={props.label}
+          style={props.labelStyle}
+        />
+        {label && (
+          <span className="labelNumber">&nbsp;({label}/{props.value.length})</span>
         )}
-        style={style}
-      >
-        <div className="labelContainer">
-
-          <Label
-            className={labelClass}
-            htmlFor={`${name}NotNeeded`}
-            message={label}
-            style={labelStyle}
-          />
-          { this.state.label && (
-            <span className="labelNumber">&nbsp;({this.state.label}/{value.length})</span>
-          )}
-        </div>
-        <InputFile
-          multiple={multiple}
-          name={name}
-          onChange={onChange}
-          setLabel={this.setLabel}
-          value={value}
-        />
-        <InputDescription
-          className={inputDescriptionClassName}
-          message={inputDescription}
-          style={inputDescriptionStyle}
-        />
       </div>
-    );
-  }
+      <InputFile
+        multiple={props.multiple}
+        name={props.name}
+        onChange={props.onChange}
+        setLabel={setLabel}
+        value={props.value}
+      />
+      <InputDescription
+        className={props.inputDescriptionClassName}
+        message={props.inputDescription}
+        style={props.inputDescriptionStyle}
+      />
+    </div>
+  );
 }
 
 InputFileWithErrors.defaultProps = {

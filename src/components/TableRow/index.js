@@ -15,6 +15,7 @@ import './styles.scss';
 
 
 const TableRow = (props) => {
+  console.log(props.data);
   return (
     <tr
       className="tableRow"
@@ -25,15 +26,19 @@ const TableRow = (props) => {
       }}
     >
       {props.headers.map(header => {
-        if (header === 'pictures' && !isEmpty(props.data[header])) {
+
+        if (header === 'pictures' && 'attributes' in props.data && !isEmpty(props.data.attributes[header])) {
           // Get the first pictures for display
-          const picture = isArray(props.data[header]) ? get(props.data, [header, '0', 'url'], '') : get(props.data, ['header', 'url'], '');
+
+          const picture = isArray(props.data.attributes[header].data) ?
+            get(props.data.attributes, [header, 'data', '0', 'attributes', 'url'], '') :
+            get(props.data.attributes, [header, 'data', 'attributes', 'url'], '');
           // check if we need to add the strapiBackendURL if the upload provider is local
-          const src = startsWith(picture, '/') ? `http://localhost:1337${picture}` : picture;
+          const src = startsWith(picture, '/') ? `${process.env.REACT_APP_STRAPI_HOST}${picture}` : picture;
 
           return (
             <td key={header}>
-              <img src={src} alt={props.data[header].name} />
+              <img src={src} alt={props.data.attributes[header].name} />
             </td>
           );
         }
@@ -47,9 +52,17 @@ const TableRow = (props) => {
           );
         }
 
+        if (header === 'id') {
+          return (
+            <td key={header}>
+              {props.data.id}
+            </td>
+          );
+        }
+
         return (
           <td key={header}>
-            {props.data[header]}
+            {props.data.attributes[header]}
           </td>
         );
       })}

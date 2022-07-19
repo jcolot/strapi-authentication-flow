@@ -2,14 +2,12 @@
   display: flex;
   justify-content: space-around;
   text-align: center;
-  padding: 170px 0;
+  padding: 110px 0;
   background: #FAFAFB;
-  height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
 .wrapper {
-  height: 221px;
   width: 685px;
   text-align: center;
   /* background-image: url('../../images/background_empty.svg'); */

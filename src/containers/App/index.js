@@ -36,12 +36,12 @@ const App = () => {
             <Route exact path='/' element={<HomePage />} />
           </Route>
 
-          <Route exact path="/product" element={<PrivateRoute />}>
-            <Route exact path="/product" element={<ProductPage />} />
+          <Route exact path="/products" element={<PrivateRoute />}>
+            <Route exact path="/products" element={<ProductPage />} />
           </Route>
 
-          <Route exact path="/:contentType/:id" element={<PrivateRoute />}>
-            <Route exact path="/:contentType/:id" element={<EditPage />} />
+          <Route exact path="/products/:id" element={<PrivateRoute />}>
+            <Route exact path="/products/:id" element={<EditPage />} />
           </Route>
 
           <Route exact path="/connect/:provider" element={<ConnectPage />} />

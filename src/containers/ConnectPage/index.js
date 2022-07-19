@@ -26,7 +26,7 @@ const ConnectPage = () => {
 
   useEffect(() => {
 
-    const requestURL = `http://localhost:1337/auth/${match.provider}/callback${location.search}`;
+    const requestURL = `${process.env.REACT_APP_STRAPI_HOST}/auth/${match.provider}/callback${location.search}`;
 
     request(requestURL, { method: 'GET' })
       .then(response => {

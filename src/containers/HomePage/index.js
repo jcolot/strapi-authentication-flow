@@ -10,14 +10,15 @@ import Button from '../../components/Button';
 import auth from '../../utils/auth';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div style={{ marginTop: '15%' }}>
       <h1>You're now logged in!!!</h1>
       <div style={{ marginTop: '50px' }}>
-        <Button
+        <Button className="btn shadow m-auto mb-4"
           primary
           onClick={() => {
-            let navigate = useNavigate();
             auth.clearAppStorage();
             navigate('/auth/login');
           }}
@@ -26,7 +27,7 @@ const HomePage = () => {
         </Button>
       </div>
       <div>
-        <Link to="/product">
+        <Link to="/products">
           See all products
         </Link>
       </div>

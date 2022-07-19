@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { findIndex, get, map, isEmpty } from 'lodash';
+import { findIndex, get, set, map, isEmpty, forOwn } from 'lodash';
 // Components
 import Button from '../../components/Button';
 import Input from '../../components/InputsIndex';
@@ -20,7 +20,6 @@ import layout from './layout.json';
 
 import './styles.scss';
 
-// Constant used to when to send the files on the `/upload` instand of `/:contentType` route.
 const FILE_RELATIONS = {
   product: [{ name: 'pictures', multiple: true }],
 };
@@ -31,32 +30,45 @@ const EditPage = () => {
   const navigate = useNavigate();
   const [didCheckErrors, setDidCheckErrors] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [inititalData, setInitialData] = useState({});
+  const [initialData, setInitialData] = useState({});
   const [modifiedData, setModifiedData] = useState({});
 
-  const title = params.id === 'create' ? `Create a new ${params.contentType}` : `Edit ${params.id}`;
-  const display = layout[params.contentType];
+  const title = params.id === 'create' ? `Create a new product` : `Edit ${params.id}`;
+  const display = layout["product"];
 
-  const getData = async () => {
+  const getProduct = async () => {
     if (params.id !== 'create') {
-      const requestURL = `http://localhost:1337/${params.contentType}/${params.id}`;
+      const requestURL = `${process.env.REACT_APP_STRAPI_HOST}/api/products/${params.id}?populate=*`;
       const data = await request(requestURL, { method: 'GET' });
-
-      setInitialData({ inititalData: data });
-      setModifiedData({ data });
+      const formattedData = {};
+      forOwn(get(data, ['data', 'attributes'], {}), (value, key) => {
+        if (key === 'pictures') {
+          const pictures = get(value, ['data'], []);
+          formattedData[key] = [];
+          pictures.forEach(element => {
+            const pictureAttributes = get(element, 'attributes', false);
+            if (pictureAttributes) formattedData[key].push(pictureAttributes);
+          });
+        } else {
+          formattedData[key] = value;
+        }
+      });
+      setInitialData(formattedData);
+      setModifiedData(formattedData);
     }
   }
 
   useEffect(() => {
-    getData();
+    getProduct();
   }, []);
 
 
   // Reset form to its inital value
-  const cancel = () => setModifiedData(inititalData);
+  const cancel = () => setModifiedData(initialData);
 
   const handleChange = (e) => {
     const name = e.target.name;
+    console.log({ ...modifiedData, [name]: e.target.value });
     setModifiedData({ ...modifiedData, [name]: e.target.value });
   }
 
@@ -64,7 +76,7 @@ const EditPage = () => {
     e.preventDefault();
     // TODO handle errors
     const body = Object.keys(modifiedData).reduce((acc, current) => {
-      if (findIndex(FILE_RELATIONS[params.contentType], ['name', current]) === -1) {
+      if (findIndex(FILE_RELATIONS['product'], ['name', current]) === -1) {
         acc[current] = modifiedData[current];
       } else {
         const alreadyUploadedFiles = modifiedData[current].filter(file => {
@@ -78,22 +90,19 @@ const EditPage = () => {
     }, {});
 
     const method = params.id === 'create' ? 'POST' : 'PUT';
-    const requestURL = params.id === 'create' ? `http://localhost:1337/${params.contentType}` : `http://localhost:1337/${params.contentType}/${params.id}`;
+    const requestURL = params.id === 'create' ? `${process.env.REACT_APP_STRAPI_HOST}/api/products` : `${process.env.REACT_APP_STRAPI_HOST}/api/products/${params.id}`;
     return request(requestURL, { method, body: body })
       .then(resp => {
         // Send the upload request for each added file
-        if (!isEmpty(FILE_RELATIONS[params.contentType])) {
-          map(FILE_RELATIONS[params.contentType], (value, key) => {
+        if (!isEmpty(FILE_RELATIONS['product'])) {
+          map(FILE_RELATIONS['product'], (value, key) => {
             if (!isEmpty(modifiedData[value.name])) {
               const body = new FormData();
               const refId = method === 'POST' ? resp.id : params.id;
               body.append('refId', refId);
-              body.append('ref', params.contentType);
+              body.append('ref', 'product');
               body.append('field', value.name);
 
-              if (params.contentType === 'user') {
-                body.apprend('source', 'users-permissions');
-              }
 
               map(modifiedData[value.name], file => {
                 if (file instanceof File) {
@@ -101,12 +110,7 @@ const EditPage = () => {
                 }
               });
 
-              // Helper to visualize FormData
-              // for(var pair of body.entries()) {
-              //   console.log(pair[0]+ ', '+ pair[1]);
-              // }
-
-              return request('http://localhost:1337/upload', { method: 'POST', body, headers: {} }, false)
+              return request(`${process.env.REACT_APP_STRAPI_HOST}/api/upload`, { method: 'POST', body, headers: {} }, false)
                 .catch(err => {
                   console.log('error upload', err.response);
                 });
@@ -120,7 +124,7 @@ const EditPage = () => {
         //  TODO: Handle errors
       }).finally(() => {
         // TODO: make sure the redirection happens when all the files have been updated
-        navigate(`/${params.contentType}`);
+        navigate('/products');
       });
   }
 
@@ -128,7 +132,6 @@ const EditPage = () => {
     <div className="editPageWrapper">
       <div className="container-fluid">
         <h1>{title}</h1>
-        <Link to={`/${params.contentType}`}>Back</Link>
         <form className="formWrapper" onSubmit={handleSubmit}>
           <div className="row">
             {display.map((input) => (

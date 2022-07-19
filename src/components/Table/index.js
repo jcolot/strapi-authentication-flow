@@ -14,6 +14,7 @@ import TableEmpty from '../TableEmpty';
 import './styles.scss';
 
 const Table = (props) => {
+
   return (
     <table className="table tableWrapper">
       <TableHeader
@@ -30,7 +31,7 @@ const Table = (props) => {
               onClick={props.onClick}
             />
           )
-        )}
+          )}
       </tbody>
     </table>
   );
@@ -40,7 +41,7 @@ const Table = (props) => {
 Table.defaultProps = {
   data: [],
   header: [],
-  onClick: () => {},
+  onClick: () => { },
 };
 
 Table.propTypes = {

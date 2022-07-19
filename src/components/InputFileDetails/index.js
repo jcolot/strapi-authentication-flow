@@ -20,7 +20,7 @@ function InputFileDetails(props) {
     return <div />
   }
 
-  const url = startsWith(props.file.url, '/') ? `http://localhost:1337${props.file.url}` : props.file.url;
+  const url = startsWith(props.file.url, '/') ? `${process.env.REACT_APP_STRAPI_HOST}${props.file.url}` : props.file.url;
 
   return (
     <div className="inputFileDetails">
