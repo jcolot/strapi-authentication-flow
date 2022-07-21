@@ -87,6 +87,7 @@ export default function request(
   // Stringify body object
   if (options && options.body && stringify) {
     options.body = JSON.stringify(options.body);
+    console.log(options.body);
   }
 
   return fetch(url, options)

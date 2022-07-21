@@ -15,7 +15,6 @@ import './styles.scss';
 
 
 const TableRow = (props) => {
-  console.log(props.data);
   return (
     <tr
       className="tableRow"
@@ -75,7 +74,6 @@ TableRow.defaultProps = {
   headers: [],
   onClick: (e) => {
     e.preventDefault();
-    console.log('click');
   },
 };
 

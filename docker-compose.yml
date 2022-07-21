@@ -2,34 +2,61 @@ version: '3.9'
 
 services:
   app:
+    container_name: strapi-react-app
     build: .
     ports:
-      - "8000:3000"
-
-  strapi:
-    container_name: strapi
-    image: naskio/strapi
-    environment:
-      - DATABASE_CLIENT=postgres
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=strapi
-      - DATABASE_USERNAME=strapi
-      - DATABASE_PASSWORD=strapi
-    ports:
-      - 1337:1337
-    volumes:
-      - ./app:/srv/app
+      - "3000:3000"
+    networks:
+      - strapi
     depends_on:
-      - db
-
-  db:
-    container_name: postgres
-    image: postgres
-    restart: always
-    volumes:
-      - ./db:/var/lib/postgresql/data
+      - strapi-server
+  strapi-server:
+    container_name: strapi-server
+    build: ./strapi
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: strapi
-      POSTGRES_PASSWORD: strapi
-      POSTGRES_DB: strapi
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: strapi-db
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./strapi/config:/opt/app/config
+      - ./strapi/src:/opt/app/src
+      - ./strapi/package.json:/opt/package.json
+      - ./strapi/yarn.lock:/opt/yarn.lock
+      - ./strapi/.env:/opt/app/.env
+    ports:
+      - '1337:1337'
+    networks:
+      - strapi
+    depends_on:
+      - strapi-db
+
+  strapi-db:
+    image: postgres:14.4-alpine
+    container_name: strapi-db
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME} 
+    volumes:
+      - strapi-data:/var/lib/postgresql/data/ 
+    ports:
+      - ${DATABASE_PORT}:5432
+    networks:
+      - strapi
+
+volumes:
+  strapi-data:
+
+networks:
+  strapi:
+    name: Strapi
+    driver: bridge

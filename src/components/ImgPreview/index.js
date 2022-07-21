@@ -35,8 +35,8 @@ const ImgPreview = (props) => {
     if (didMount.current) {
       const lastFile = props.multiple ? props.files.slice(-1)[0] : props.files[0] || props.files;
       const file = props.multiple ?
-        get(props.files, [props.files.length - 1, 'attributes'], '') :
-        get(props.files, [props.position, 'attributes'], '') || get(props.files, 'attributes', '');
+        get(props.files, props.files.length - 1, '') :
+        get(props.files, props.position, '') || get(props.files, '');
 
       if (lastFile) {
         generateImgURL(lastFile);
@@ -51,7 +51,7 @@ const ImgPreview = (props) => {
 
   // Update the preview or slide pictures
   useEffect(() => {
-    const file = get(props.files, [props.position, 'attributes'], '') || get(props.files, 'attributes', '');
+    const file = get(props.files, props.position, '') || get(props.files, '');
     generateImgURL(file);
   }, [props.didDeleteFile, props.position, props.files]);
 
@@ -65,12 +65,14 @@ const ImgPreview = (props) => {
    * @return {URL}
    */
   const generateImgURL = (file) => {
-    if (isPictureType(file.name) && !has(file, 'url')) {
+    if (!file) {
+      setIsImg(false);
+      setImgURL('');
+    } else if (isPictureType(file.name) && !has(file, 'url')) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImgURL(reader.result);
         setIsImg(true);
-        console.log('here');
       }
       reader.readAsDataURL(file);
     } else if (has(file, 'url')) {
@@ -129,7 +131,6 @@ const ImgPreview = (props) => {
   const renderContent = () => {
 
     const fileType = getFileType(imgURL);
-    console.log(isEmpty(imgURL));
     if (isImg) {
       return (
         <img src={imgURL} />

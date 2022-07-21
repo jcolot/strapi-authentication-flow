@@ -26,7 +26,6 @@ const InputFile = (props) => {
   const addFilesToProps = (files) => {
     const initAcc = props.multiple ? cloneDeep(props.value) : {};
     const value = Object.keys(files).reduce((acc, current) => {
-      console.log(acc);
       if (props.multiple) {
         acc.push(files[current]);
       } else if (current === '0') {

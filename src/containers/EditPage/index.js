@@ -68,7 +68,6 @@ const EditPage = () => {
 
   const handleChange = (e) => {
     const name = e.target.name;
-    console.log({ ...modifiedData, [name]: e.target.value });
     setModifiedData({ ...modifiedData, [name]: e.target.value });
   }
 
@@ -88,19 +87,18 @@ const EditPage = () => {
       }
       return acc;
     }, {});
-
     const method = params.id === 'create' ? 'POST' : 'PUT';
     const requestURL = params.id === 'create' ? `${process.env.REACT_APP_STRAPI_HOST}/api/products` : `${process.env.REACT_APP_STRAPI_HOST}/api/products/${params.id}`;
-    return request(requestURL, { method, body: body })
+    return request(requestURL, { method, body: {data: body} })
       .then(resp => {
         // Send the upload request for each added file
         if (!isEmpty(FILE_RELATIONS['product'])) {
           map(FILE_RELATIONS['product'], (value, key) => {
             if (!isEmpty(modifiedData[value.name])) {
               const body = new FormData();
-              const refId = method === 'POST' ? resp.id : params.id;
+              const refId = method === 'POST' ? get(resp, ['data', 'id'], '') : params.id;
               body.append('refId', refId);
-              body.append('ref', 'product');
+              body.append('ref', 'api::product.product');
               body.append('field', value.name);
 
 
